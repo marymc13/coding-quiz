@@ -3,6 +3,9 @@ const questionContainerElement = document.getElementById("question-container")
 const nextButton = document.getElementById('next-btn')
 const questionElement = document.getElementById("question")
 const answerButtonsElement = document.getElementById("answer-buttons")
+const userAnswer = '';
+const numCorrect = 0
+const output = [];
 
 let shuffledQuestions, currentQuestionIndex
 
@@ -40,6 +43,7 @@ question.answers.forEach(answer =>{
     }
     button.addEventListener('click',selectAnswer)
     answerButtonsElement.appendChild(button)
+    
 })
 }
 
@@ -50,12 +54,27 @@ function selectAnswer(e) {
   Array.from(answerButtonsElement.children).forEach(button => {
     setStatusClass(button, button.dataset.correct)
   })
+  
   if (shuffledQuestions.length > currentQuestionIndex + 1) { 
   nextButton.classList.remove('hide')
 } else {
     startButton.innerText = 'Restart'
     startButton.classList.remove('hide')
 } 
+//for each question
+for (var i = 0; i < questions.length; i++) {
+    answers = [];
+//find selected answer by user
+    userAnswer = (answerContainers[i].querySelector("input[name=question' +i+']:checked")||{}).value;
+//if answer is correct
+    if (userAnswer===questions[i].correctAnswer) {
+        numCorrect++;
+        answerContainers.style.color = 'green';
+ //if answer is incorrect
+    }else {
+        answerContainers[i].style.color = 'red'
+    }
+}
 }  
 function setStatusClass(element, correct) {
     clearStatusClass(element)
@@ -64,6 +83,16 @@ function setStatusClass(element, correct) {
     }  else{
         element.classList.add('wrong')
     }
+}
+function showResults(quizContainer) {
+    var answerContainers = quizContainer.querySelectorAll('.answers')
+    console.log(answerContainers)
+}
+resultsContainer.innerHTML = numCorrect + 'out of ' + questions.length;
+
+//on submit, show results
+submitButton.onclick = function() {
+    showResults(questions, quizContainer, resultsContainer)
 }
 
 function clearStatusClass(element) {
@@ -78,6 +107,7 @@ function resetState(){
         answerButtonsElement.removeChild
         (answerButtonsElement.firstChild)
     }
+
 
 
 }
