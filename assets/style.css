@@ -44,7 +44,7 @@ body {
     border-color: red;
 }
 
-.start-btn, .next-btn {
+.start-btn, .next-btn, .submit-btn {
     font-size: 1.5rem;
     font-weight: bold;
     padding: 10px 20px;

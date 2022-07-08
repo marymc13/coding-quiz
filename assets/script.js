@@ -1,116 +1,18 @@
 const startButton = document.getElementById("start-btn")
 const questionContainerElement = document.getElementById("question-container")
-const nextButton = document.getElementById('next-btn')
 const questionElement = document.getElementById("question")
+const answerContainer = document.createElement("answer-container")
+const resultsContainer = document.getElementById("results-container")
+const nextButton = document.getElementById('next-btn')
 const answerButtonsElement = document.getElementById("answer-buttons")
 const userAnswer = '';
+const submitButton = document.getElementById("submit-btn")
+const questionCount = document.querySelector(".number-of-questions")
 const numCorrect = 0
+const answers = [];
 const output = [];
 
 let shuffledQuestions, currentQuestionIndex
-
-//Start Game  on click
-startButton.addEventListener("click", startGame)
-nextButton.addEventListener('click', () => {
-    currentQuestionIndex++
-    setNextQuestion()
-})
-
-function startGame() {
-    console.log("Started")
-    startButton.classList.add("hide")
-    shuffledQuestions = questions.sort(() => Math.random() - 5)
-    currentQuestionIndex = 0
-    questionContainerElement.classList.remove('hide')
-    setNextQuestion()
-}
-
-function setNextQuestion() {
-    resetState()
-    showQuestion(shuffledQuestions[currentQuestionIndex])
-}
-
-
-
-function showQuestion(question){
-questionElement.innerText = question.question
-question.answers.forEach(answer =>{
-    const button = document.createElement('button')
-    button.innerText = answer.text
-    button.classList.add('btn')
-    if (answer.correct) {
-        button.dataset.correct = answer.correct
-    }
-    button.addEventListener('click',selectAnswer)
-    answerButtonsElement.appendChild(button)
-    
-})
-}
-
-function selectAnswer(e) {
-  const selectedButton = e.target
-  const correct = selectedButton.dataset.correct
-  setStatusClass(document.body, correct)
-  Array.from(answerButtonsElement.children).forEach(button => {
-    setStatusClass(button, button.dataset.correct)
-  })
-  
-  if (shuffledQuestions.length > currentQuestionIndex + 1) { 
-  nextButton.classList.remove('hide')
-} else {
-    startButton.innerText = 'Restart'
-    startButton.classList.remove('hide')
-} 
-//for each question
-for (var i = 0; i < questions.length; i++) {
-    answers = [];
-//find selected answer by user
-    userAnswer = (answerContainers[i].querySelector("input[name=question' +i+']:checked")||{}).value;
-//if answer is correct
-    if (userAnswer===questions[i].correctAnswer) {
-        numCorrect++;
-        answerContainers.style.color = 'green';
- //if answer is incorrect
-    }else {
-        answerContainers[i].style.color = 'red'
-    }
-}
-}  
-function setStatusClass(element, correct) {
-    clearStatusClass(element)
-    if (correct) {
-        element.classList.add('correct')
-    }  else{
-        element.classList.add('wrong')
-    }
-}
-function showResults(quizContainer) {
-    var answerContainers = quizContainer.querySelectorAll('.answers')
-    console.log(answerContainers)
-}
-resultsContainer.innerHTML = numCorrect + 'out of ' + questions.length;
-
-//on submit, show results
-submitButton.onclick = function() {
-    showResults(questions, quizContainer, resultsContainer)
-}
-
-function clearStatusClass(element) {
-    element.classList.remove('correct')
-    element.classList.remove('wrong')
-}
-
-function resetState(){
-    clearStatusClass(document.body)
-    nextButton.classList.add('hide')
-    while (answerButtonsElement.firstChild) {
-        answerButtonsElement.removeChild
-        (answerButtonsElement.firstChild)
-    }
-
-
-
-}
 
 //Question and Answer Set
 const questions = [
@@ -161,3 +63,116 @@ const questions = [
     }
 
 ]
+
+//Start Game on click
+startButton.addEventListener("click", startGame)
+nextButton.addEventListener('click', () => {
+    currentQuestionIndex++
+    setNextQuestion()
+})
+
+function startGame() {
+    console.log("Started")
+    startButton.classList.add("hide")
+    shuffledQuestions = questions.sort(() => Math.random() - 5)
+    currentQuestionIndex = 0
+    questionContainerElement.classList.remove('hide')
+    setNextQuestion()
+}
+//Show question one at a time
+function setNextQuestion() {
+    resetState()
+    showQuestion(shuffledQuestions[currentQuestionIndex])
+}
+
+function showQuestion(question){
+questionElement.innerText = question.question
+question.answers.forEach(answer =>{
+    const button = document.createElement('button')
+    button.innerText = answer.text
+    button.classList.add('btn')
+    if (answer.correct) {
+        button.dataset.correct = answer.correct
+    }
+    button.addEventListener('click',selectAnswer)
+    answerButtonsElement.appendChild(button)  
+})
+}
+// Answer Select
+ function selectAnswer(e) {
+  const selectedButton = e.target
+  const correct = selectedButton.dataset.correct
+  setStatusClass(document.body, correct)
+  Array.from(answerButtonsElement.children).forEach(button => {
+    setStatusClass(button, button.dataset.correct)
+  })
+  if (shuffledQuestions.length > currentQuestionIndex + 1) { 
+  nextButton.classList.remove('hide')
+} else {
+    startButton.innerText = 'Restart'
+    startButton.classList.remove('hide')
+} 
+
+//for each question
+for (var i = 0; i < questions.length; i++) {
+    saveAnswers()
+    loadAnswers()
+    console.log("answer saved")
+
+}
+}
+
+function setStatusClass(element, correct) {
+    clearStatusClass(element)
+//C0rrect answer
+    if (correct) {
+        element.classList.add('correct')
+//Incorrect answer
+    }  else{
+        element.classList.add('wrong')
+    }
+}
+//Results
+function showResults(quizContainer) {
+    var answerContainers = quizContainer.querySelectorAll('.answers')
+    console.log(answerContainers)
+}
+
+//on submit, show results
+submitButton.onclick = function() {
+    showResults(questions, quizContainer, resultsContainer)
+}
+//Remove correct/incorrect for next question
+function clearStatusClass(element) {
+    element.classList.remove('correct')
+    element.classList.remove('wrong')
+}
+
+function resetState(){
+    clearStatusClass(document.body)
+    nextButton.classList.add('hide')
+    while (answerButtonsElement.firstChild) {
+        answerButtonsElement.removeChild
+        (answerButtonsElement.firstChild)
+    }
+}
+
+var saveAnswers = function() {
+    localStorage.setItem("answers", JSON.stringify(answers));
+};
+
+var loadAnswers = function() {
+    var trueAnswers = localStorage.getItem("answers");
+   
+   if (!trueAnswers) {
+       return false
+   }
+   console.log("true answers found");
+// Convert tasks from the string format back into an array of objects
+trueAnswers = JSON.parse(trueAnswers);
+
+for (var i = 0; i < trueAnswers.length; i++) {
+   createTaskEl(trueAnswers[i]);
+   console.log(trueAnswers[i]);
+}
+};
